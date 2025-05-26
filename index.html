@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow | Gerenciador de Tarefas</title>
+    
+    <!-- Fontes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar / Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-tasks"></i> TaskFlow</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#" data-page="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#" data-page="all-tasks"><i class="fas fa-list"></i> Todas as Tarefas</a></li>
+                    <li><a href="#" data-page="calendar"><i class="fas fa-calendar"></i> Calendário</a></li>
+                    <li><a href="#" data-page="statistics"><i class="fas fa-chart-bar"></i> Estatísticas</a></li>
+                    <li><a href="#" data-page="settings"><i class="fas fa-cog"></i> Configurações</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p>Criado por <b>WELLINGTON MEDEIROS</b></p>
+                <p class="version">v1.0.0</p>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="user-actions">
+                    <button id="theme-toggle" class="icon-button">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="notifications-container">
+                        <button id="notifications-btn" class="icon-button">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-count" class="notification-badge">3</span>
+                        </button>
+                        <div id="notifications-panel" class="notifications-panel hidden">
+                            <div class="panel-header">
+                                <h3>Notificações</h3>
+                                <div class="panel-actions">
+                                    <button id="mark-all-read" class="text-button">
+                                        <i class="fas fa-check-double"></i> Marcar tudo como lido
+                                    </button>
+                                    <button id="close-notifications" class="close-button">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <ul id="notifications-list" class="notifications-list">
+                                    <!-- Notificações serão inseridas aqui via JavaScript -->
+                                </ul>
+                                <div id="empty-notifications" class="empty-state hidden">
+                                    <i class="fas fa-bell-slash empty-icon"></i>
+                                    <h3>Nenhuma notificação</h3>
+                                    <p>Você está em dia com tudo!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div id="dashboard-page" class="page-container">
+                <!-- Resumo / Cards -->
+                <section class="summary-section">
+                    <div class="card summary-card">
+                        <div class="summary-icon blue">
+                            <i class="fas fa-list-check"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Total de Tarefas</h3>
+                            <p id="total-tasks">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card summary-card">
+                        <div class="summary-icon orange">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Em Progresso</h3>
+                            <p id="in-progress">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card summary-card">
+                        <div class="summary-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Concluídas</h3>
+                            <p id="completed">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card summary-card">
+                        <div class="summary-icon red">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Atrasadas</h3>
+                            <p id="overdue">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Estatísticas / Gráficos -->
+                <section class="stats-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Progresso das Tarefas</h2>
+                            <div class="dropdown">
+                                <button class="dropdown-button">Esta Semana <i class="fas fa-chevron-down"></i></button>
+                                <div class="dropdown-content">
+                                    <a href="#">Esta Semana</a>
+                                    <a href="#">Este Mês</a>
+                                    <a href="#">Este Ano</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="tasks-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Distribuição por Categoria</h2>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="category-chart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Lista de Tarefas Recentes -->
+                <section class="tasks-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Tarefas Recentes</h2>
+                            <button id="add-task-btn" class="primary-button">
+                                <i class="fas fa-plus"></i> Nova Tarefa
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <table class="tasks-table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Categoria</th>
+                                        <th>Prazo</th>
+                                        <th>Status</th>
+                                        <th>Prioridade</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tasks-list">
+                                    <!-- As tarefas serão inseridas aqui via JavaScript -->
+                                </tbody>
+                            </table>
+                            <div id="empty-tasks" class="empty-state">
+                                <i class="fas fa-tasks empty-icon"></i>
+                                <h3>Nenhuma tarefa encontrada</h3>
+                                <p>Comece adicionando uma nova tarefa!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+                    <!-- Página: Todas as Tarefas -->
+            <div id="all-tasks-page" class="page-container hidden">
+                <header class="page-header">
+                    <h2>Todas as Tarefas</h2>
+                    <div class="page-actions">
+                        <button id="add-task-btn-all" class="primary-button">
+                            <i class="fas fa-plus"></i> Nova Tarefa
+                        </button>
+                    </div>
+                </header>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label>Status:</label>
+                                <select id="filter-status">
+                                    <option value="all">Todos</option>
+                                    <option value="pendente">Pendente</option>
+                                    <option value="em-progresso">Em Progresso</option>
+                                    <option value="concluida">Concluída</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Categoria:</label>
+                                <select id="filter-category">
+                                    <option value="all">Todas</option>
+                                    <option value="trabalho">Trabalho</option>
+                                    <option value="pessoal">Pessoal</option>
+                                    <option value="estudo">Estudo</option>
+                                    <option value="saude">Saúde</option>
+                                    <option value="financas">Finanças</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Prioridade:</label>
+                                <select id="filter-priority">
+                                    <option value="all">Todas</option>
+                                    <option value="alta">Alta</option>
+                                    <option value="media">Média</option>
+                                    <option value="baixa">Baixa</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Ordenar por:</label>
+                                <select id="sort-by">
+                                    <option value="dueDate">Data de Vencimento</option>
+                                    <option value="priority">Prioridade</option>
+                                    <option value="title">Título</option>
+                                    <option value="category">Categoria</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-tasks-all" placeholder="Buscar tarefas...">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="tasks-table">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th>Prazo</th>
+                                    <th>Status</th>
+                                    <th>Prioridade</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-tasks-list">
+                                <!-- As tarefas serão inseridas aqui via JavaScript -->
+                            </tbody>
+                        </table>
+                        <div id="empty-all-tasks" class="empty-state hidden">
+                            <i class="fas fa-tasks empty-icon"></i>
+                            <h3>Nenhuma tarefa encontrada</h3>
+                            <p>Ajuste os filtros ou adicione novas tarefas!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Página: Calendário -->
+            <div id="calendar-page" class="page-container hidden">
+                <header class="page-header">
+                    <h2>Calendário de Tarefas</h2>
+                    <div class="calendar-navigation">
+                        <button id="prev-month" class="icon-button"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="current-month">Maio 2025</h3>
+                        <button id="next-month" class="icon-button"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </header>
+                
+                <div class="calendar-container">
+                    <div class="calendar-weekdays">
+                        <div>Dom</div>
+                        <div>Seg</div>
+                        <div>Ter</div>
+                        <div>Qua</div>
+                        <div>Qui</div>
+                        <div>Sex</div>
+                        <div>Sáb</div>
+                    </div>
+                    <div id="calendar-days" class="calendar-days">
+                        <!-- Os dias do calendário serão gerados via JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Painel lateral para mostrar tarefas do dia -->
+                <div id="day-tasks-panel" class="day-tasks-panel hidden">
+                    <div class="panel-header">
+                        <h3 id="selected-date">Tarefas para 23/05/2025</h3>
+                        <button id="close-day-panel" class="close-button">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="panel-content">
+                        <div id="empty-day-tasks" class="empty-state hidden">
+                            <h3>Nenhuma tarefa para este dia</h3>
+                            <p>Adicione tarefas para organizar seu dia</p>
+                        </div>
+                        <ul id="day-tasks-list" class="day-tasks-list">
+                            <!-- Tarefas do dia selecionado serão listadas aqui -->
+                        </ul>
+                    </div>
+                    <div class="panel-footer">
+                        <button id="add-task-calendar" class="action-button add-task">
+                            <i class="fas fa-plus"></i> Adicionar Tarefa para este Dia
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Página: Estatísticas -->
+            <div id="statistics-page" class="page-container hidden">
+                <header class="page-header">
+                    <h2>Estatísticas Detalhadas</h2>
+                    <div class="stats-period-selector">
+                        <button class="secondary-button active" data-period="week">Semana</button>
+                        <button class="secondary-button" data-period="month">Mês</button>
+                        <button class="secondary-button" data-period="year">Ano</button>
+                    </div>
+                </header>
+                
+                <div class="stats-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Produtividade por Dia</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="productivity-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Distribuição por Categoria</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="category-distribution-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Progresso ao Longo do Tempo</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="progress-timeline-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Métricas de Desempenho</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="metrics-grid">
+                                <div class="metric-card">
+                                    <h4>Taxa de Conclusão</h4>
+                                    <div class="metric-value" id="completion-rate">0%</div>
+                                </div>
+                                <div class="metric-card">
+                                    <h4>Tarefas por Dia</h4>
+                                    <div class="metric-value" id="tasks-per-day">0</div>
+                                </div>
+                                <div class="metric-card">
+                                    <h4>Tempo Médio de Conclusão</h4>
+                                    <div class="metric-value" id="avg-completion-time">0 dias</div>
+                                </div>
+                                <div class="metric-card">
+                                    <h4>Tarefas Atrasadas</h4>
+                                    <div class="metric-value" id="overdue-percentage">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Página: Configurações -->
+            <div id="settings-page" class="page-container hidden">
+                <header class="page-header">
+                    <h2>Configurações</h2>
+                </header>
+                
+                <div class="settings-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Preferências de Aparência</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="settings-group">
+                                <label>Tema:</label>
+                                <div class="settings-controls">
+                                    <button id="theme-light" class="settings-button">Claro</button>
+                                    <button id="theme-dark" class="settings-button">Escuro</button>
+                                    <button id="theme-auto" class="settings-button active">Sistema</button>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <label>Cor Primária:</label>
+                                <div class="color-options">
+                                    <button class="color-option active" style="--color: #4361ee;" data-color="#4361ee"></button>
+                                    <button class="color-option" style="--color: #2ecc71;" data-color="#2ecc71"></button>
+                                    <button class="color-option" style="--color: #e74c3c;" data-color="#e74c3c"></button>
+                                    <button class="color-option" style="--color: #f39c12;" data-color="#f39c12"></button>
+                                    <button class="color-option" style="--color: #9b59b6;" data-color="#9b59b6"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Categorias</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="category-manager">
+                                <div class="category-list" id="categories-list">
+                                    <!-- Lista de categorias será gerada via JavaScript -->
+                                </div>
+                                <div class="category-form">
+                                    <input type="text" id="new-category-name" placeholder="Nome da categoria">
+                                    <input type="color" id="new-category-color" value="#3498db">
+                                    <button id="add-category-btn" class="primary-button">Adicionar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Dados e Exportação</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="settings-actions">
+                                <button id="export-data" class="secondary-button">
+                                    <i class="fas fa-download"></i> Exportar Tarefas
+                                </button>
+                                <button id="import-data" class="secondary-button">
+                                    <i class="fas fa-upload"></i> Importar Tarefas
+                                </button>
+                                <button id="clear-data" class="danger-button">
+                                    <i class="fas fa-trash"></i> Limpar Todos os Dados
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Sobre</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="about-info">
+                                <h4>TaskFlow</h4>
+                                <p class="version">Versão 1.0.0</p>
+                                <p>Um gerenciador de tarefas moderno e eficiente, desenvolvido com HTML, CSS e JavaScript puros.</p>
+                                <p>Criado por <strong>WELLINGTON MEDEIROS</strong></p>
+                                <div class="social-links">
+                                    <a href="https://github.com/seu-username" target="_blank" class="social-link">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://linkedin.com/in/seu-perfil" target="_blank" class="social-link">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Tarefas -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Nova Tarefa</h2>
+                <button id="close-modal" class="close-button"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="task-form">
+                    <input type="hidden" id="task-id">
+                    <div class="form-group">
+                        <label for="task-title">Título</label>
+                        <input type="text" id="task-title" placeholder="Digite o título da tarefa" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-description">Descrição</label>
+                        <textarea id="task-description" placeholder="Descreva sua tarefa (opcional)"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-category">Categoria</label>
+                            <select id="task-category" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="trabalho">Trabalho</option>
+                                <option value="pessoal">Pessoal</option>
+                                <option value="estudo">Estudo</option>
+                                <option value="saude">Saúde</option>
+                                <option value="financas">Finanças</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="task-priority">Prioridade</label>
+                            <select id="task-priority" required>
+                                <option value="baixa">Baixa</option>
+                                <option value="media" selected>Média</option>
+                                <option value="alta">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-due-date">Data de Vencimento</label>
+                            <input type="date" id="task-due-date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="task-status">Status</label>
+                            <select id="task-status" required>
+                                <option value="pendente" selected>Pendente</option>
+                                <option value="em-progresso">Em Progresso</option>
+                                <option value="concluida">Concluída</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="cancel-task" class="secondary-button">Cancelar</button>
+                        <button type="submit" class="primary-button">Salvar Tarefa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/storage.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

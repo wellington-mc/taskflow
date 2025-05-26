@@ -94,8 +94,8 @@ taskflow/
 ## 👤 Autor
 
 **WELLINGTON MEDEIROS**
-- GitHub: [@seu-username](https://github.com/seu-username) <!-- Atualize com seu nome de usuário do GitHub -->
-- LinkedIn: [seu-linkedin](https://linkedin.com/in/seu-linkedin) <!-- Atualize com seu perfil do LinkedIn -->
+- GitHub: [@wellington-mc](https://github.com/seu-username) <!-- Atualize com seu nome de usuário do GitHub -->
+- LinkedIn: [wellington-medeiros](https://www.linkedin.com/in/wellington-medeiros-8891942b0/) <!-- Atualize com seu perfil do LinkedIn -->
 
 ## 📄 Licença
 

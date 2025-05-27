@@ -12,7 +12,7 @@ TaskFlow é um aplicativo web completo para gerenciamento de tarefas desenvolvid
 
 <div align="center">
   <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-    <img src="assets/screenshots/lista de tarefas.PNG.png" alt="Lista de Tarefas" width="48%">
+    <img src="assets/screenshots/tarefas.PNG" alt="Lista de Tarefas" width="48%">
     <img src="assets/screenshots/calendario.PNG" alt="Visualização em Calendário" width="48%">
   </div>
   <div style="display: flex; justify-content: space-between;">
